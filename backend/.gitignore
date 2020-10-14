@@ -4,7 +4,10 @@
 /node_modules
 /.pnp
 .pnp.js
-.sqlite
+uploads/*
+!uploads/.gitkeep
+
+*.sqlite
 src/database/database.sqlite
 # testing
 /coverage
