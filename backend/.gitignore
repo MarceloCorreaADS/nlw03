@@ -4,7 +4,8 @@
 /node_modules
 /.pnp
 .pnp.js
-*.sqlite3
+.sqlite
+src/database/database.sqlite
 # testing
 /coverage
 
