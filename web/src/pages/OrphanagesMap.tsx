@@ -37,12 +37,12 @@ function OrphanagesMap() {
 
 				<footer>
 					<strong>Guarulhos</strong>
-					<span>Santa Catarina</span>
+					<span>São Paulo</span>
 				</footer>
 			</aside>
 			<Map
-				center={[-23.4443412, -46.5004462]}
-				zoom={15}
+				center={[-23.3918537, -46.5933868]}
+				zoom={11}
 				style={{ width: '100%', height: '100%' }}
 			>
 				<TileLayer url="https://a.tile.openstreetmap.org/{z}/{x}/{y}.png" />
