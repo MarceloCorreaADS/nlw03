@@ -1,4 +1,4 @@
-import User from "../models/user";
+import User from "../models/User";
 
 export default{
   render(user: User){
@@ -6,7 +6,6 @@ export default{
       id: user.id,
       name: user.name,
       email: user.email,
-      password: user.password
     };
   },
 
