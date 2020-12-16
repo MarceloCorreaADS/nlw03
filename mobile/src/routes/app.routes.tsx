@@ -1,26 +1,32 @@
 import React from 'react';
-
-import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import OrphanagesMap from './pages/OrphanagesMap';
-import OrphanageDetails from './pages/OrphanageDetails';
+import Dashboard from '../pages/Dashboard';
+import OrphanagesMap from '../pages/OrphanagesMap';
+import OrphanageDetails from '../pages/OrphanageDetails';
+import SelectMapPosition from '../pages/CreateOrphanage/SelectMapPosition';
+import OrphanageData from '../pages/CreateOrphanage/OrphanageData';
+import Header from '../components/Header';
 
-import SelectMapPosition from './pages/CreateOrphanage/SelectMapPosition';
-import OrphanageData from './pages/CreateOrphanage/OrphanageData';
-import Header from './components/Header';
+const AppStack = createStackNavigator();
 
-const { Navigator, Screen } = createStackNavigator();
 
-export default function Routes(){
+export default function appRoutes(){
     return(
-        <NavigationContainer>
-            <Navigator screenOptions={{ headerShown: false, cardStyle: { backgroundColor: '#f2f3f5' }}}>
-                <Screen 
+            <AppStack.Navigator screenOptions={{ headerShown: false, cardStyle: { backgroundColor: '#f2f3f5' }}}>
+                <AppStack.Screen 
+                name="Dashboard" 
+                component={Dashboard} 
+                options={{
+                    headerShown: true,
+                    header: () => <Header showCancel={false} title="Dashboard" showSignOut={true} />
+                }}
+                />
+                <AppStack.Screen 
                     name="OrphanagesMap" 
                     component={OrphanagesMap} 
                 />
-                <Screen 
+                <AppStack.Screen 
                     name="OrphanageDetails" 
                     component={OrphanageDetails} 
                     options={{
@@ -28,7 +34,7 @@ export default function Routes(){
                         header: () => <Header showCancel={false} title="Orfanato" />
                     }}
                 />
-                <Screen 
+                <AppStack.Screen 
                     name="SelectMapPosition" 
                     component={SelectMapPosition} 
                     options={{
@@ -36,7 +42,7 @@ export default function Routes(){
                         header: () => <Header title="Selecione no mapa" />
                     }}
                 />
-                <Screen 
+                <AppStack.Screen 
                     name="OrphanageData" 
                     component={OrphanageData} 
                     options={{
@@ -44,8 +50,6 @@ export default function Routes(){
                         header: () => <Header title="Informe os dados" />
                     }}
                 />
-                
-            </Navigator>
-        </NavigationContainer>
-    );
-}
+            </AppStack.Navigator>
+    )
+};

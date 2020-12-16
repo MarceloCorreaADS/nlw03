@@ -1,10 +1,11 @@
 import React from 'react';
+import Routes from './src/routes/routes';
+import { NavigationContainer } from '@react-navigation/native';
+
+import {AuthProvider} from './src/contexts/auth';
 
 import { useFonts } from 'expo-font';
 import { Nunito_600SemiBold, Nunito_700Bold, Nunito_800ExtraBold } from '@expo-google-fonts/nunito';
-
-import Routes from './src/routes';
-
 
 export default function App() {
   const [fonstLoaded] = useFonts({
@@ -18,6 +19,10 @@ export default function App() {
   }
 
   return (
-    <Routes />
+    <NavigationContainer>
+        <AuthProvider>
+          <Routes />
+        </AuthProvider>
+    </NavigationContainer>
   );
 }
