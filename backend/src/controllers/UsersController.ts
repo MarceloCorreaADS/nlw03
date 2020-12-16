@@ -65,6 +65,7 @@ export default {
     const usersRepository = getRepository(User);
 
     const user = await usersRepository.findOneOrFail({email});
+
     if(!(await user.compareHash(password).catch((e) => { console.error(e.message) }))){
       return response.status(400).json({ error: "Invalid password" });
     }
