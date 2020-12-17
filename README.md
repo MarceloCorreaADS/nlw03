@@ -17,7 +17,7 @@ O Happy é uma aplicação que conecta pessoas à casas de acolhimento instituci
 Desenvolvido na Next Level Week #03, workshop sediado pela [Rocktseat](https://rocketseat.com.br/).
 
 🧠 Desafios - Próximas implementações
-- [ ] Acesso restrito
+- [x] Acesso restrito
 - [ ] Recuperação de senhas
 - [ ] Cadastro de orfanatos
 - [ ] Splash Screen no React Native com Expo
