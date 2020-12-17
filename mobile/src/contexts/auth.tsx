@@ -1,11 +1,16 @@
-import React , { createContext, useState, useEffect } from 'react';
+import React , { createContext, useState, useEffect, useContext } from 'react';
 import AsyncStorage from '@react-native-community/async-storage';
 import api from '../services/api';
-import { ActivityIndicator, View } from 'react-native';
+
+interface User {
+    id: number;
+    name: string;
+    email: string;
+}
 
 interface AuthContextData{
     signed: boolean;
-    user: object | null;
+    user: User | null;
     signIn(email: string, password: string): Promise<void>;
     signOut(): void;
     loading: boolean;
@@ -17,7 +22,7 @@ interface AuthContextData{
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 export function AuthProvider(props: {children: IProps;} ){
-    const [user, setUser] = useState<object | null>(null);
+    const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
 
 
@@ -25,11 +30,12 @@ export function AuthProvider(props: {children: IProps;} ){
         async function loadStorageData (){
             const storagedUser = await AsyncStorage.getItem('@HappyAuth:user');
             const storagedToken = await AsyncStorage.getItem('@HappyAuth:token');
+            api.defaults.headers['Authorization'] = `Bearer ${storagedToken}`;
 
-            if(storagedUser && storagedToken ){
+            if(storagedUser && storagedToken){
                 setUser(JSON.parse(storagedUser));
-                setLoading(false);
             }
+            setLoading(false);
         }
 
         loadStorageData();
@@ -42,6 +48,11 @@ export function AuthProvider(props: {children: IProps;} ){
         });
 
         setUser(response.data.user);
+
+        api.defaults.headers['Authorization'] = `Bearer ${response.data.token}`;
+
+        console.log(response.data.user);
+        console.log(user?.email);
 
         await AsyncStorage.setItem('@HappyAuth:user', JSON.stringify(response.data.user));
         await AsyncStorage.setItem('@HappyAuth:token', response.data.token);
@@ -60,3 +71,9 @@ export function AuthProvider(props: {children: IProps;} ){
 };
 
 export default AuthContext;
+
+export function useAuth(){
+    const context = useContext(AuthContext);
+
+    return context;
+}

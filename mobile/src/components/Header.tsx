@@ -1,50 +1,63 @@
 import React, { useContext } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
-import { BorderlessButton } from 'react-native-gesture-handler';
+import { BorderlessButton, RectButton } from 'react-native-gesture-handler';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import AuthContext from '../contexts/auth';
+import { useAuth } from '../contexts/auth';
 
-interface HeaderProps{
+interface HeaderProps {
     title: string;
+    showGoBack?: boolean;
     showCancel?: boolean;
-    showSignOut ?: boolean;
+    showSignOut?: boolean;
 }
 
-export default function Header({title, showCancel = true, showSignOut = false}: HeaderProps){
+export default function Header({ title, showGoBack = true, showCancel = true, showSignOut = false }: HeaderProps) {
     const navigation = useNavigation();
-    const { signOut } = useContext(AuthContext);
+    const { signOut } = useAuth();
 
-    function handleGoBackToAppHomepage(){
+    function handleGoBackToAppHomepage() {
         navigation.navigate('OrphanagesMap');
     }
-    function handleToSignOut(){
+    function handleToSignOut() {
         signOut();
     }
 
-    return(
+    function handleToSignIn() {
+        navigation.navigate('SignIn');
+    }
+
+    return (
         <View style={styles.container}>
-            <BorderlessButton onPress={navigation.goBack}>
-                <Feather name="arrow-left" size={24} color="#15b6d6" />
-            </BorderlessButton>
 
-           <Text style={styles.title}>{title}</Text>
-
-           { showCancel ? (
-                <BorderlessButton onPress={handleGoBackToAppHomepage}>
-                    <Feather name="x" size={24} color="#ff669d" />
+            { showGoBack ? (
+                <BorderlessButton onPress={navigation.goBack}>
+                    <Feather name="arrow-left" size={24} color="#15b6d6" />
                 </BorderlessButton>
-            ) :  (
-               <View />
-           )}
+            ) : (
+                    <View />
+                )}
 
-            { showSignOut ? (
-                <BorderlessButton onPress={handleToSignOut}>
-                    <Text>Sair</Text>
-                </BorderlessButton>
-            ) :  (
-               <View />
-            )}
+            <Text style={styles.title}>{title}</Text>
+            <View style={styles.buttonsRight}>
+                {showCancel ? (
+                    <BorderlessButton onPress={handleGoBackToAppHomepage} style={{ paddingRight: 10 }}>
+                        <Feather name="x" size={24} color="#ff669d" />
+                    </BorderlessButton>
+                ) : (
+                        null
+                    )}
+
+                {showSignOut ? (
+                    <RectButton onPress={handleToSignOut} >
+                        <Feather name="log-out" size={24} color="#ff669d" />
+                    </RectButton>
+                ) : (
+                        <RectButton onPress={handleToSignIn}>
+                            <Feather name="log-in" size={24} color="#3CDC8C" />
+                        </RectButton>
+                    )}
+            </View>
         </View>
     );
 }
@@ -62,7 +75,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
 
-    title:{
+    buttonsRight: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+
+    title: {
         fontFamily: 'Nunito_600SemiBold',
         color: '#8fa7b3',
         fontSize: 16,
