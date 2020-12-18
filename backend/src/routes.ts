@@ -16,13 +16,15 @@ routes.post('/orphanages', upload.array('images'),OrphanagesController.create);
 
 /* Rota de autenticação de usuários */
 routes.post('/authenticate', UsersController.authenticate);
-
-/* Middleware que faz a verificação do token */
-routes.use(authMiddleware);
-/* rotas que só são acessadas com token válido */
+routes.post('/forgotPassword', UsersController.forgotPassword);
 routes.get('/me/:id', UsersController.me);
 routes.get('/users', UsersController.index);
 routes.get('/users/:id', UsersController.show);
 routes.post('/users', UsersController.create);
+
+/* Middleware que faz a verificação do token */
+routes.use(authMiddleware);
+/* rotas que só são acessadas com token válido */
+
 
 export default routes;

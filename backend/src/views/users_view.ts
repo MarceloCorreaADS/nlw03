@@ -6,6 +6,8 @@ export default{
       id: user.id,
       name: user.name,
       email: user.email,
+      isTemporaryPassword: user.isTemporaryPassword,
+      temporaryPasswordExpires: user.temporaryPasswordExpires
     };
   },
 

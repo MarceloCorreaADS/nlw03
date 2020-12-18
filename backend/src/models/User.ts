@@ -1,5 +1,4 @@
 import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert, BeforeUpdate } from 'typeorm';
-
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
@@ -17,6 +16,12 @@ export default class User {
 
   @Column()
   password: string;
+
+  @Column()
+  isTemporaryPassword: boolean;
+
+  @Column()
+  temporaryPasswordExpires: Date;
 
   @BeforeInsert()
   @BeforeUpdate()

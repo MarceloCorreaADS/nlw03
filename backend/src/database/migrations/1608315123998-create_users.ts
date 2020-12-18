@@ -27,6 +27,14 @@ export class users1607956422796 implements MigrationInterface {
             name: 'password',
             type: 'varchar'
           },
+          {
+            name: 'isTemporaryPassword',
+            type: 'boolean'
+          },
+          {
+            name: 'temporaryPasswordExpires',
+            type: 'date',
+          },
         ],
       }))
     }
