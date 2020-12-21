@@ -15,6 +15,18 @@ export default {
       return response.status(400).json({ error: "Invalid password" });
     }
 
+    /* verificar se é uma senha temporária e se for senha temporária verifica se ainda é válida */
+
+    if (user.isTemporaryPassword) {
+      const now = new Date();
+      now.setHours(now.getHours());
+
+      if(user.temporaryPasswordExpires < now){
+        return response.status(401).json({ error: "Temporary password expired" });
+      }
+    }
+    
+
     return response.json({
       user,
       token: user.generateToken()
@@ -67,8 +79,10 @@ export default {
   },
 
   async changePassword(request: Request, response: Response) {
-    const { id, password } = request.body;
+    const { id, newPassword } = request.body;
     const usersRepository = getRepository(User);
+
+    console.log(id + " - " + newPassword);
 
     /* Procura o usuario pelo id pois o usuário ja logou com a senha temporária */
     const user = await usersRepository.findOneOrFail(id);
@@ -77,25 +91,12 @@ export default {
     //  return response.status(400).json({ error: "User not found" });
     
     /* Altera os dados do User com a nova senha */
-    user.password = password;
+    user.password = newPassword;
     user.isTemporaryPassword = false; 
 
     /* Atualiza o User - Metodo update não foi usado por que não ativa o @BeforeUpdate */
     await usersRepository.save(user);
      
-    return response.status(200).send({ Sucess :'Password changed with sucess!'})
+    return response.json(user).status(200).send({ Sucess :'Password changed with sucess!'})
   },
-
-  async me(request: Request, response: Response) {
-    try {
-      const usersRepository = getRepository(User);  
-      const { id } = request.params;
-  
-      const user = await usersRepository.findOneOrFail(id);
-  
-      return response.json({ user });
-    } catch (err) {
-      return response.status(400).json({ error: "Can't get user information" });
-    }
-  }
 }
