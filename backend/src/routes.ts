@@ -1,9 +1,10 @@
-import { request, Router } from 'express';
+import { Router } from 'express';
 import multer from 'multer';
 
 import uploadConfig from './config/upload';
 import OrphanagesController from './controllers/OrphanagesController';
 import UsersController from './controllers/UsersController';
+import AuthsController from './controllers/AuthsController';
 import authMiddleware from "./middlewares/auth";
 
 const routes = Router();
@@ -14,17 +15,22 @@ routes.get('/orphanages', OrphanagesController.index);
 routes.get('/orphanages/:id', OrphanagesController.show);
 routes.post('/orphanages', upload.array('images'),OrphanagesController.create);
 
-/* Rota de autenticação de usuários */
-routes.post('/authenticate', UsersController.authenticate);
-routes.post('/forgotPassword', UsersController.forgotPassword);
-routes.get('/me/:id', UsersController.me);
-routes.get('/users', UsersController.index);
-routes.get('/users/:id', UsersController.show);
-routes.post('/users', UsersController.create);
+/* Rota de autenticação */
+routes.post('/authenticate', AuthsController.authenticate);
+routes.post('/forgotPassword', AuthsController.forgotPassword);
 
 /* Middleware que faz a verificação do token */
 routes.use(authMiddleware);
 /* rotas que só são acessadas com token válido */
+
+/* Rota de usuários */ 
+routes.get('/users', UsersController.index);
+routes.get('/users/:id', UsersController.show);
+routes.post('/users', UsersController.create);
+
+/* Rotas de autenticação*/ 
+routes.get('/me/:id', AuthsController.me);
+routes.post('/users', AuthsController.changePassword);
 
 
 export default routes;
