@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Image, View, ScrollView, Text, StyleSheet, Dimensions, Linking, TouchableOpacity} from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
-import { Feather, FontAwesome } from '@expo/vector-icons';
-import { RectButton } from 'react-native-gesture-handler';
+import { Feather } from '@expo/vector-icons';
 import { useRoute } from '@react-navigation/native';
 
 import mapMarkerImg from '../images/map-marker.png';

@@ -6,6 +6,7 @@ interface User {
     id: number;
     name: string;
     email: string;
+    isTemporaryPassword: boolean;
 }
 
 interface AuthContextData{
@@ -13,8 +14,10 @@ interface AuthContextData{
     user: User | null;
     signIn(email: string, password: string): Promise<void>;
     signOut(): void;
+    upadteUser(user: User): Promise<void>;
     loading: boolean;
 }
+
  interface IProps {
     children: React.ReactNode;
  }
@@ -51,9 +54,6 @@ export function AuthProvider(props: {children: IProps;} ){
 
         api.defaults.headers['Authorization'] = `Bearer ${response.data.token}`;
 
-        console.log(response.data.user);
-        console.log(user?.email);
-
         await AsyncStorage.setItem('@HappyAuth:user', JSON.stringify(response.data.user));
         await AsyncStorage.setItem('@HappyAuth:token', response.data.token);
     }
@@ -63,8 +63,14 @@ export function AuthProvider(props: {children: IProps;} ){
             setUser(null);
         });
     }
+
+    async function upadteUser(user: User){
+        setUser(user);
+        await AsyncStorage.setItem('@HappyAuth:user', JSON.stringify(user));
+    }
+    
     return(
-        <AuthContext.Provider value={{signed: !!user, user: user, signIn, loading, signOut}}>
+        <AuthContext.Provider value={{signed: !!user, user: user, signIn, loading, signOut, upadteUser}}>
             {props.children}
         </AuthContext.Provider>
     )

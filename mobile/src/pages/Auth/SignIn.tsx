@@ -1,21 +1,22 @@
 import React, { useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
 import { Text, StyleSheet, ScrollView, TextInput, Switch, View } from 'react-native';
 import { BorderlessButton, RectButton } from 'react-native-gesture-handler';
-import { useAuth } from '../contexts/auth';
-
+import { useAuth } from '../../contexts/auth';
 
 export default function SignIn() {
   const { signIn } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
+  const navigation = useNavigation();
 
   function handleSignIn() {
     signIn(email, password);
   }
 
-  function handleToForgetPassword(){
-
+  async function handleToForgotPassword(){
+    navigation.navigate('ForgotPassword');
   }
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ padding: 24 }}>
@@ -43,12 +44,12 @@ export default function SignIn() {
           />
           <Text style={{ color: '#8FA7B2' }}>Lembrar-me</Text>
         </View>
-        <BorderlessButton onPress={handleToForgetPassword} style={{ paddingRight: 10 }}>
+        <BorderlessButton onPress={handleToForgotPassword} style={{ paddingRight: 10 }}>
           <Text style={{ color: '#8FA7B2', alignItems: 'center', justifyContent: 'space-between' }}>Esqueci {"\n"}minha senha</Text>     
         </BorderlessButton>
       </View>
       <RectButton style={styles.SignInButton} onPress={handleSignIn}>
-        <Text style={styles.nextButtonText}>Entrar</Text>
+        <Text style={styles.SignInButtonText}>Entrar</Text>
       </RectButton>
     </ScrollView>
   )
@@ -75,11 +76,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
 
-  comment: {
-    fontSize: 11,
-    color: '#8fa7b3',
-  },
-
   input: {
     backgroundColor: '#fff',
     borderWidth: 1.4,
@@ -101,7 +97,7 @@ const styles = StyleSheet.create({
     marginTop: 32,
   },
 
-  nextButtonText: {
+  SignInButtonText: {
     fontFamily: 'Nunito_800ExtraBold',
     fontSize: 16,
     color: '#FFF',
