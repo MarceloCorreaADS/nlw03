@@ -18,7 +18,8 @@ Desenvolvido na Next Level Week #03, workshop sediado pela [Rocktseat](https://r
 
 🧠 Desafios - Próximas implementações
 - [x] Acesso restrito
-- [ ] Recuperação de senhas
+- [x] Recuperação de senhas
+- [ ] Menu de usuário
 - [ ] Cadastro de orfanatos
 - [ ] Splash Screen no React Native com Expo
 - [ ] Onboarding do usuário
