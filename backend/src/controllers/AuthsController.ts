@@ -79,24 +79,25 @@ export default {
   },
 
   async changePassword(request: Request, response: Response) {
-    const { id, newPassword } = request.body;
+    const { id, password, newPassword } = request.body;
     const usersRepository = getRepository(User);
-
-    console.log(id + " - " + newPassword);
 
     /* Procura o usuario pelo id pois o usuário ja logou com a senha temporária */
     const user = await usersRepository.findOneOrFail(id);
-
     //if(!user)
     //  return response.status(400).json({ error: "User not found" });
-    
-    /* Altera os dados do User com a nova senha */
-    user.password = newPassword;
-    user.isTemporaryPassword = false; 
+    if((await user.compareHash(password).catch((e) => { console.error(e.message) }))){
+      
+      /* Altera os dados do User com a nova senha */
+      user.password = newPassword;
+      user.isTemporaryPassword = false; 
 
-    /* Atualiza o User - Metodo update não foi usado por que não ativa o @BeforeUpdate */
-    await usersRepository.save(user);
+      /* Atualiza o User - Metodo update não foi usado por que não ativa o @BeforeUpdate */
+      await usersRepository.save(user);
      
-    return response.json(user).status(200).send({ Sucess :'Password changed with sucess!'})
+      return response.json(user).status(200).send({ sucess :'Password changed with sucess!'})
+    }else{
+      return response.status(401).json({ error :'Incorrect password!'})
+    }
   },
 }

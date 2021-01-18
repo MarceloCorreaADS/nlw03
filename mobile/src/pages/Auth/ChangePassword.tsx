@@ -15,29 +15,64 @@ interface User {
 export default function ChangePassword() {
   const { user, upadteUser } = useAuth();
   const navigation = useNavigation();
+  const [password, setPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
   
 
   async function handleToChangePassword(){
 
-    const response = await api.post('changePassword', {
-      id: user?.id,
-      newPassword: newPassword
-    });
+    if( newPassword !== confirmNewPassword){
+      alert("As senhas não conferem!");
 
-    upadteUser(response.data as User);
+      return null;
+    }
+    try{
+      const response = await api.post('changePassword', {
+        id: user?.id,
+        password: password,
+        newPassword: newPassword
+      });
 
-       
-    navigation.navigate('Dashboard');
+      upadteUser(response.data as User);
+      alert("Senha alterada com sucesso!"); 
+      setPassword('');
+      setNewPassword('');
+      setConfirmNewPassword('');
+
+      navigation.navigate('Dashboard');
+    }catch(error){
+      if(error.response){
+        alert(error.response.data.error);
+      } else if (error.request){
+        console.log(error.request);
+      } else {
+        console.log('Error', error.message);
+      }
+    }    
   }
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ padding: 24 }}>
+      <Text style={styles.label}>Senha</Text>
+      <TextInput
+        secureTextEntry
+        style={[styles.input]}
+        value={password} 
+        onChangeText={setPassword}
+      />
       <Text style={styles.label}>Nova senha</Text>
       <TextInput
         secureTextEntry
         style={[styles.input]}
         value={newPassword}
         onChangeText={setNewPassword}
+      />
+      <Text style={styles.label}>Confirme a nova senha</Text>
+      <TextInput
+        secureTextEntry
+        style={[styles.input]}
+        value={confirmNewPassword}
+        onChangeText={setConfirmNewPassword}
       />
       <RectButton style={styles.changePasswordButton} onPress={handleToChangePassword}>
         <Text style={styles.changePasswordButtonText}>Alterar Senha</Text>

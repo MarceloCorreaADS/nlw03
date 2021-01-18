@@ -39,10 +39,10 @@ const styles = StyleSheet.create({
 
   instructions: {
     color: '#5c8599',
-    fontSize: 24,
+    fontSize: 16,
     fontFamily: 'Nunito_700Bold',
-    marginBottom: 32,
-    paddingBottom: 24,
+    marginBottom: 10,
+    paddingBottom: 10,
     borderBottomWidth: 0.8,
     borderBottomColor: '#D3E2E6'
   },

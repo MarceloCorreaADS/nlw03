@@ -58,8 +58,14 @@ export function AuthProvider(props: {children: IProps;} ){
     
             await AsyncStorage.setItem('@HappyAuth:user', JSON.stringify(response.data.user));
             await AsyncStorage.setItem('@HappyAuth:token', response.data.token);
-        }catch(err){
-            alert(err.error);
+        }catch(error){
+            if(error.response){
+                alert(error.response.data.error);
+            } else if (error.request){
+                console.log(error.request);
+            } else {
+                console.log('Error', error.message);
+            }
         }
     }
 
