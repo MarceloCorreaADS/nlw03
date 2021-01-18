@@ -125,7 +125,6 @@ export default function CreateOrphanage() {
                 value={about}
                 onChange={event => setAbout(event.target.value)}
               />
-              />
             </div>
 
             <div className="input-block">
@@ -157,7 +156,6 @@ export default function CreateOrphanage() {
                 value={instructions}
                 onChange={event => setInstructions(event.target.value)}
               />
-              />
             </div>
 
             <div className="input-block">
@@ -166,7 +164,6 @@ export default function CreateOrphanage() {
                 id="opening_hours" 
                 value={opening_hours}
                 onChange={event => setOpeningHours(event.target.value)}
-              />
               />
             </div>
 

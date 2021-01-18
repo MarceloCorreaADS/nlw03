@@ -1,6 +1,7 @@
 import React , { createContext, useState, useEffect, useContext } from 'react';
 import AsyncStorage from '@react-native-community/async-storage';
 import api from '../services/api';
+import { Alert } from 'react-native';
 
 interface User {
     id: number;
@@ -45,17 +46,21 @@ export function AuthProvider(props: {children: IProps;} ){
     }, []);
 
     async function signIn(email: string, password: string){
-        const response = await api.post('authenticate', {
-            email: email,
-            password: password
-        });
-
-        setUser(response.data.user);
-
-        api.defaults.headers['Authorization'] = `Bearer ${response.data.token}`;
-
-        await AsyncStorage.setItem('@HappyAuth:user', JSON.stringify(response.data.user));
-        await AsyncStorage.setItem('@HappyAuth:token', response.data.token);
+        try{
+            const response = await api.post('authenticate', {
+                email: email,
+                password: password
+            });
+    
+            setUser(response.data.user);
+    
+            api.defaults.headers['Authorization'] = `Bearer ${response.data.token}`;
+    
+            await AsyncStorage.setItem('@HappyAuth:user', JSON.stringify(response.data.user));
+            await AsyncStorage.setItem('@HappyAuth:token', response.data.token);
+        }catch(err){
+            alert(err.error);
+        }
     }
 
     function signOut(){
