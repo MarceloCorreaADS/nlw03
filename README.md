@@ -20,7 +20,7 @@ Desenvolvido na Next Level Week #03, workshop sediado pela [Rocktseat](https://r
 - [x] Acesso restrito
 - [x] Recuperação de senhas
 - [x] Menu de usuário
-- [ ] Cadastro de orfanatos
+- [ ] Aprovação de cadastro de orfanatos
 - [ ] Splash Screen no React Native com Expo
 - [ ] Onboarding do usuário
 - [ ] Localização real do usuário

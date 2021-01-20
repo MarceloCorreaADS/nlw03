@@ -9,7 +9,23 @@ export default {
     const orphanagesRepository = getRepository(Orphanage);
 
     const orphanages = await orphanagesRepository.find({
-      relations: ['images']
+      relations: ['images'],
+      where: {
+        register_approved: true
+      }
+    });
+
+    return response.json(orphanagesView.renderMany(orphanages));
+  },
+
+  async indexPending(request: Request, response: Response) {
+    const orphanagesRepository = getRepository(Orphanage);
+
+    const orphanages = await orphanagesRepository.find({
+      relations: ['images'],
+      where: {
+        register_approved: false
+      }
     });
 
     return response.json(orphanagesView.renderMany(orphanages));
@@ -35,7 +51,8 @@ export default {
       about,
       instructions,
       opening_hours,
-      open_on_weekends
+      open_on_weekends,
+      register_approved
     } = request.body;
 
     const orphanagesRepository = getRepository(Orphanage);
@@ -54,6 +71,7 @@ export default {
       instructions,
       opening_hours,
       open_on_weekends: open_on_weekends === 'true',
+      register_approved,
       images
     };
 
@@ -65,6 +83,7 @@ export default {
       instructions: Yup.string().required(),
       opening_hours: Yup.string().required(),
       open_on_weekends: Yup.boolean().required(),
+      register_approved: Yup.boolean().required(),
       images: Yup.array(
         Yup.object().shape({
           path: Yup.string().required()
@@ -83,5 +102,88 @@ export default {
     await orphanagesRepository.save(orphanage);
 
     return response.status(201).json(orphanage);
-  }
+  },
+
+  async approve(request: Request, response: Response) {
+    const { id } = request.params;
+
+    const orphanagesRepository = getRepository(Orphanage);
+
+    const orphanage = await orphanagesRepository.findOneOrFail(id);
+
+    orphanage.register_approved = true;
+
+    await orphanagesRepository.save(orphanage);
+
+    return response.status(200).json({ sucess :'Orphanage aprroved with sucess!'});
+  },
+
+  async update(request: Request, response: Response) {
+    const {
+      id,
+      name,
+      latitude,
+      longitude,
+      about,
+      instructions,
+      opening_hours,
+      open_on_weekends,
+      register_approved,
+    } = request.body;
+
+    const orphanagesRepository = getRepository(Orphanage);
+
+    const orphanage = await orphanagesRepository.findOneOrFail(id);
+
+    //const requestImages = request.files as Express.Multer.File[];
+
+    //const images = requestImages.map(image => {
+    //  return { path: image.filename }
+    //})
+
+    const data = {
+      id,
+      name,
+      latitude,
+      longitude,
+      about,
+      instructions,
+      opening_hours,
+      open_on_weekends: open_on_weekends === 'true',
+      register_approved,
+      //images
+    };
+
+    const schema = Yup.object().shape({
+      name: Yup.string().required(),
+      latitude: Yup.number().required(),
+      longitude: Yup.number().required(),
+      about: Yup.string().required().max(300),
+      instructions: Yup.string().required(),
+      opening_hours: Yup.string().required(),
+      open_on_weekends: Yup.boolean().required(),
+      //images: Yup.array(
+      //  Yup.object().shape({
+      //    path: Yup.string().required()
+      //  })
+      //)
+    });
+
+    await schema.validate(data, {
+      abortEarly: false,
+    })
+
+    orphanage.name = data.name;
+    orphanage.latitude = data.latitude;
+    orphanage.longitude = data.longitude;
+    orphanage.about = data.about;
+    orphanage.instructions = data.instructions;
+    orphanage.opening_hours = data.opening_hours;
+    orphanage.open_on_weekends = data.open_on_weekends;
+    //orphanage.images = [data.images];
+
+    await orphanagesRepository.save(orphanage);
+
+    return response.status(200).json(orphanage);
+  },
 };

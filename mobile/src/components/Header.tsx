@@ -8,10 +8,10 @@ interface HeaderProps {
   title: string;
   showGoBack?: boolean;
   showCancel?: boolean;
-  showSignOut?: boolean;
+  showDrawerMenu?: boolean;
 }
 
-export default function Header({ title, showGoBack = true, showCancel = true, showSignOut = false }: HeaderProps) {
+export default function Header({ title, showGoBack = true, showCancel = true, showDrawerMenu = false }: HeaderProps) {
   const navigation = useNavigation();
 
   function handleGoBackToAppHomepage() {
@@ -46,7 +46,7 @@ export default function Header({ title, showGoBack = true, showCancel = true, sh
             null
           )}
 
-        {showSignOut ? (
+        {showDrawerMenu ? (
           <RectButton onPress={handleToOpenDrawer} >
             <Feather name="user" size={24} color="#3CDC8C" />
           </RectButton>

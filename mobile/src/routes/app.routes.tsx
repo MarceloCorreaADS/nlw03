@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
 import Header from '../components/Header';
-import Dashboard from '../pages/Dashboard';
+import OrphanagesRegistered from '../pages/Dashboard/OrphanagesRegistered';
+import OrphanagesPending from '../pages/Dashboard/OrphanagesPending';
 import ChangePassword from '../pages/Auth/ChangePassword';
 import { Feather } from '@expo/vector-icons';
 import { createDrawerNavigator, DrawerContentComponentProps, DrawerContentScrollView, DrawerItem, DrawerItemList} from '@react-navigation/drawer';
@@ -36,11 +37,19 @@ export default function appRoutes() {
       }} 
     >
       <AppDrawer.Screen
-        name="Dashboard"
-        component={Dashboard}
+        name="Orfanatos Cadastrados"
+        component={OrphanagesRegistered}
         options={{
           headerShown: true,
-          header: () => <Header showGoBack={false} showCancel={false} title="Dashboard" showSignOut={true} />
+          header: () => <Header showGoBack={false} showCancel={false} title="Orfanatos Cadastrados" showDrawerMenu={true} />
+        }}
+      />
+      <AppDrawer.Screen
+        name="Cadastros Pendentes"
+        component={OrphanagesPending}
+        options={{
+          headerShown: true,
+          header: () => <Header showGoBack={true} showCancel={false} title="Cadastros Pendentes" showDrawerMenu={true} />
         }}
       />
       <AppDrawer.Screen
@@ -48,7 +57,7 @@ export default function appRoutes() {
         component={ChangePassword}
         options={{
           headerShown: true,
-          header: () => <Header showGoBack={true} showCancel={false} title="Alterar Senha" showSignOut={true} />
+          header: () => <Header showGoBack={true} showCancel={false} title="Alterar Senha" showDrawerMenu={true} />
         }}
       />
     </AppDrawer.Navigator>

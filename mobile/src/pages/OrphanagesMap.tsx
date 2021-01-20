@@ -16,12 +16,12 @@ interface Orphanage{
 }
 
 export default function OrphanagesMap() {
-    const [orphanages, setOrphanges] = useState<Orphanage[]>([]);
+    const [orphanages, setOrphanages] = useState<Orphanage[]>([]);
     const navigation = useNavigation();
 
     useFocusEffect(() => {
         api.get('orphanages').then(response => {
-            setOrphanges(response.data);
+            setOrphanages(response.data);
         });
     });
 
