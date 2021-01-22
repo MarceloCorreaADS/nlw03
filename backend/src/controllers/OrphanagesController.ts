@@ -104,20 +104,6 @@ export default {
     return response.status(201).json(orphanage);
   },
 
-  async approve(request: Request, response: Response) {
-    const { id } = request.params;
-
-    const orphanagesRepository = getRepository(Orphanage);
-
-    const orphanage = await orphanagesRepository.findOneOrFail(id);
-
-    orphanage.register_approved = true;
-
-    await orphanagesRepository.save(orphanage);
-
-    return response.status(200).json({ sucess :'Orphanage aprroved with sucess!'});
-  },
-
   async update(request: Request, response: Response) {
     const {
       id,
@@ -134,6 +120,12 @@ export default {
     const orphanagesRepository = getRepository(Orphanage);
 
     const orphanage = await orphanagesRepository.findOneOrFail(id);
+
+    if(register_approved === false){
+      orphanagesRepository.delete(orphanage);
+
+      return response.status(200).json({ sucess : 'Orphanage registration refused and deleted!'});
+    }
 
     //const requestImages = request.files as Express.Multer.File[];
 
@@ -162,6 +154,7 @@ export default {
       instructions: Yup.string().required(),
       opening_hours: Yup.string().required(),
       open_on_weekends: Yup.boolean().required(),
+      register_approved: Yup.boolean().required(),
       //images: Yup.array(
       //  Yup.object().shape({
       //    path: Yup.string().required()
@@ -180,6 +173,7 @@ export default {
     orphanage.instructions = data.instructions;
     orphanage.opening_hours = data.opening_hours;
     orphanage.open_on_weekends = data.open_on_weekends;
+    orphanage.register_approved = data.register_approved;
     //orphanage.images = [data.images];
 
     await orphanagesRepository.save(orphanage);

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
+import { NavigatorScreenParams, RouteProp, useFocusEffect } from '@react-navigation/native';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import MapView, { Marker } from 'react-native-maps';
@@ -8,9 +8,34 @@ import { RectButton } from 'react-native-gesture-handler';
 
 import api from '../../services/api';
 
-import { useAuth } from '../../contexts/auth';
 import mapMarkerImg from '../../images/map-marker.png';
 import noDataImg from '../../images/no-data.png';
+
+import { DrawerNavigationProp } from '@react-navigation/drawer';
+
+type RootDrawerParamList = {
+  OrphanagesRegistered: undefined;
+  OrphanagesPending: undefined;
+  editOrphanage: NavigatorScreenParams<RootTabParamList>;
+  ChangePassword: undefined;
+};
+
+type RootTabParamList = {
+  Dados: { id: number };
+  Mapa: undefined;
+};
+
+type ProfileScreenRouteProp = RouteProp<RootDrawerParamList, 'OrphanagesPending'>;
+
+type ProfileScreenNavigationProp = DrawerNavigationProp<
+  RootDrawerParamList,
+  'OrphanagesPending'
+>;
+
+type Props = {
+  route: ProfileScreenRouteProp;
+  navigation: ProfileScreenNavigationProp;
+};
 
 interface Orphanage {
   id: number;
@@ -19,8 +44,7 @@ interface Orphanage {
   longitude: number;
 }
 
-export default function orphanagesPending() {
-  const { user } = useAuth();
+export default function orphanagesPending({navigation} : Props) {
   const [orphanages, setOrphanages] = useState<Orphanage[]>([]);
 
   useFocusEffect(() => {
@@ -29,14 +53,12 @@ export default function orphanagesPending() {
     });
   });
 
-  function handleNavigateToEditOrphanage() {
-
+  function handleNavigateToEditOrphanage(id: number) {
+    navigation.navigate('editOrphanage', {
+      screen: 'Dados',
+      params: { id : id },
+    });
   }
-
-  function handleNavigateToExcludeOrphanage() {
-
-  }
-
 
   return (
     <View>
@@ -87,14 +109,10 @@ export default function orphanagesPending() {
                     <View style={styles.bottomBarContainer}>
                       <Text style={styles.bottomBarText}>{orphanage.name}</Text>
                       <View style={styles.bottomBarButtonsContainer}>
-                        <RectButton style={styles.bottomBarButton} onPress={handleNavigateToEditOrphanage}>
-                          <Feather name="edit-3" size={20} color="#15C3D6" />
-                        </RectButton>
-                        <RectButton style={styles.bottomBarButton} onPress={handleNavigateToExcludeOrphanage}>
-                          <Feather name="trash-2" size={20} color="#15C3D6" />
+                        <RectButton style={styles.bottomBarButton} onPress={() => handleNavigateToEditOrphanage(orphanage.id)}>
+                          <Feather name="arrow-right" size={20} color="#15C3D6" />
                         </RectButton>
                       </View>
-
                     </View>
                   </View>
                 );

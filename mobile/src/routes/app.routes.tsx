@@ -1,25 +1,43 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { Feather } from '@expo/vector-icons';
+import { createDrawerNavigator, DrawerContentComponentProps, DrawerContentScrollView, DrawerItem, DrawerItemList } from '@react-navigation/drawer';
 
 import Header from '../components/Header';
 import OrphanagesRegistered from '../pages/Dashboard/OrphanagesRegistered';
 import OrphanagesPending from '../pages/Dashboard/OrphanagesPending';
 import ChangePassword from '../pages/Auth/ChangePassword';
-import { Feather } from '@expo/vector-icons';
-import { createDrawerNavigator, DrawerContentComponentProps, DrawerContentScrollView, DrawerItem, DrawerItemList} from '@react-navigation/drawer';
+import editOrphanage from '../routes/editOrphanage.routes';
+
 import { useAuth } from '../contexts/auth';
+import { Route } from '@react-navigation/native';
 
-const AppDrawer = createDrawerNavigator();
+type RootDrawerParamList = {
+  OrphanagesRegistered: undefined;
+  OrphanagesPending: undefined;
+  editOrphanage: { id: number };
+  ChangePassword: undefined;
+};
 
-function CustomDrawerContent(props : DrawerContentComponentProps) {
+const AppDrawer = createDrawerNavigator<RootDrawerParamList>();
+
+
+
+function CustomDrawerContent(props: DrawerContentComponentProps) {
   const { signOut } = useAuth();
+
+
+
+  const {state, ...rest} = props;
+  const newState = { ...state };
+  newState.routes = newState.routes.filter((item) => item.name !== "editOrphanage");
 
   function handleToSignOut() {
     return signOut();
-  } 
-  
+  }
+
   return (
     <DrawerContentScrollView {...props}>
-      <DrawerItemList {...props} />
+      <DrawerItemList state={newState} {...rest} />
       <DrawerItem label="Sair" icon={({ focused, color, size }) => <Feather name="log-out" size={24} color="#ff669d" />} onPress={handleToSignOut} />
     </DrawerContentScrollView>
   );
@@ -29,15 +47,15 @@ export default function appRoutes() {
 
   return (
     <AppDrawer.Navigator
-      drawerContent={(props) => <CustomDrawerContent {...props} {...navigator} />}
-      screenOptions={{ headerShown: false}} 
+      drawerContent={(props) => <CustomDrawerContent {...props} />}
+      screenOptions={{ headerShown: false }}
       drawerStyle={{
         backgroundColor: '#f2f3f5',
         width: 240,
-      }} 
+      }}
     >
       <AppDrawer.Screen
-        name="Orfanatos Cadastrados"
+        name="OrphanagesRegistered"
         component={OrphanagesRegistered}
         options={{
           headerShown: true,
@@ -45,7 +63,7 @@ export default function appRoutes() {
         }}
       />
       <AppDrawer.Screen
-        name="Cadastros Pendentes"
+        name="OrphanagesPending"
         component={OrphanagesPending}
         options={{
           headerShown: true,
@@ -53,7 +71,15 @@ export default function appRoutes() {
         }}
       />
       <AppDrawer.Screen
-        name="Alterar Senha"
+        name="editOrphanage"
+        component={editOrphanage}
+        options={{
+          headerShown: true,
+          header: () => <Header showGoBack={true} showCancel={false} title="Editar Orfanato" showDrawerMenu={true} />
+        }}
+      />
+      <AppDrawer.Screen
+        name="ChangePassword"
         component={ChangePassword}
         options={{
           headerShown: true,

@@ -16,8 +16,6 @@ routes.get('/orphanages', OrphanagesController.index);
 routes.get('/orphanages/:id', OrphanagesController.show);
 routes.post('/orphanages', upload.array('images'),OrphanagesController.create);
 
-routes.put('/orphanages', upload.array('images'),OrphanagesController.update);
-
 /* Rota de autenticação sem token*/
 routes.post('/authenticate', AuthsController.authenticate);
 routes.post('/forgotPassword', AuthsController.forgotPassword);
@@ -36,7 +34,7 @@ routes.post('/users', UsersController.create);
 routes.post('/changePassword', AuthsController.changePassword);
 
 /* Rotas de orfanatos com token */
-routes.post('/orphanagesApprove/:id', OrphanagesController.approve);
 routes.get('/orphanagesPending', OrphanagesController.indexPending);
+routes.put('/orphanages',OrphanagesController.update);
 
 export default routes;
