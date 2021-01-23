@@ -4,6 +4,9 @@ import { Text, StyleSheet, ScrollView, TextInput } from 'react-native';
 import { RectButton } from 'react-native-gesture-handler';
 import { useAuth } from '../../contexts/auth';
 import api from '../../services/api';
+import AlertBox from '../../components/AlertBox';
+
+import { PropsDrawer }  from '../../routes/types';
 
 interface User {
   id: number;
@@ -12,9 +15,8 @@ interface User {
   isTemporaryPassword: boolean;
 }
 
-export default function ChangePassword() {
+export default function ChangePassword( {navigation} : PropsDrawer) {
   const { user, upadteUser } = useAuth();
-  const navigation = useNavigation();
   const [password, setPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
@@ -40,7 +42,7 @@ export default function ChangePassword() {
       setNewPassword('');
       setConfirmNewPassword('');
 
-      navigation.navigate('Dashboard');
+      navigation.navigate('OrphanagesRegistered');
     }catch(error){
       if(error.response){
         alert(error.response.data.error);
@@ -53,6 +55,11 @@ export default function ChangePassword() {
   }
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ padding: 24 }}>
+      { user?.isTemporaryPassword ?
+        <AlertBox text="Sua senha é temporária e válida por um curto período de tempo. Por favor troque sua senha para continuar com acesso ao sistema!" />
+        :
+        null
+      }
       <Text style={styles.label}>Senha</Text>
       <TextInput
         secureTextEntry

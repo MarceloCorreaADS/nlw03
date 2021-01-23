@@ -1,17 +1,16 @@
-import React, { useState } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
-import MapView, { Marker } from 'react-native-maps';
+import { RectButton, ScrollView } from 'react-native-gesture-handler';
+
 import { Feather } from '@expo/vector-icons';
-import { RectButton } from 'react-native-gesture-handler';
+import MapView, { Marker } from 'react-native-maps';
 
-import api from '../../services/api';
-
-import { useAuth } from '../../contexts/auth';
-import AlertBox from '../../components/AlertBox';
 import mapMarkerImg from '../../images/map-marker.png';
 import noDataImg from '../../images/no-data.png';
+
+import { useAuth } from '../../contexts/auth';
+import api from '../../services/api';
+import { PropsDrawer }  from '../../routes/types';
 
 interface Orphanage {
   id: number;
@@ -20,33 +19,36 @@ interface Orphanage {
   longitude: number;
 }
 
-export default function OrphanagesRegistered() {
+export default function OrphanagesRegistered({navigation} : PropsDrawer) {
   const { user } = useAuth();
   const [orphanages, setOrphanages] = useState<Orphanage[]>([]);
+  const [load, setLoad] = useState(false);
 
-  useFocusEffect(() => {
+  useEffect(() => {
+    if (user?.isTemporaryPassword) {
+      navigation.navigate('ChangePassword');
+      navigation.addListener('focus', ()=>setLoad(!load))
+    }
+  }, [load, navigation]);
+
+  useEffect(() => {
     api.get('orphanages').then(response => {
       setOrphanages(response.data);
     });
   });
 
-  function handleNavigateToEditOrphanage() {
-
+  function handleNavigateToEditOrphanage(id: number) {
+    navigation.navigate('EditOrphanage', {
+      screen: 'OrphanageEditInfos',
+      params: { id : id },
+    });
   }
 
   function handleNavigateToExcludeOrphanage() {
 
   }
-
-
   return (
     <View>
-      { user?.isTemporaryPassword ?
-        <AlertBox text="Sua senha é temporária. Por favor troque sua senha!" />
-        :
-        null
-      }
-
       {
         orphanages.length === 0 ? (
           <View style={styles.noDataContainer}>
@@ -94,7 +96,7 @@ export default function OrphanagesRegistered() {
                     <View style={styles.bottomBarContainer}>
                       <Text style={styles.bottomBarText}>{orphanage.name}</Text>
                       <View style={styles.bottomBarButtonsContainer}>
-                        <RectButton style={styles.bottomBarButton} onPress={handleNavigateToEditOrphanage}>
+                        <RectButton style={styles.bottomBarButton} onPress={() => handleNavigateToEditOrphanage(orphanage.id)}>
                           <Feather name="edit-3" size={20} color="#15C3D6" />
                         </RectButton>
                         <RectButton style={styles.bottomBarButton} onPress={handleNavigateToExcludeOrphanage}>

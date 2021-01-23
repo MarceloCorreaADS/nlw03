@@ -6,30 +6,24 @@ import Header from '../components/Header';
 import OrphanagesRegistered from '../pages/Dashboard/OrphanagesRegistered';
 import OrphanagesPending from '../pages/Dashboard/OrphanagesPending';
 import ChangePassword from '../pages/Auth/ChangePassword';
-import editOrphanage from '../routes/editOrphanage.routes';
-
+import EditOrphanage from '../routes/orphanageEdit.routes';
 import { useAuth } from '../contexts/auth';
-import { Route } from '@react-navigation/native';
 
 type RootDrawerParamList = {
   OrphanagesRegistered: undefined;
   OrphanagesPending: undefined;
-  editOrphanage: { id: number };
+  EditOrphanage: { id: number };
   ChangePassword: undefined;
 };
 
 const AppDrawer = createDrawerNavigator<RootDrawerParamList>();
 
-
-
 function CustomDrawerContent(props: DrawerContentComponentProps) {
   const { signOut } = useAuth();
 
-
-
   const {state, ...rest} = props;
   const newState = { ...state };
-  newState.routes = newState.routes.filter((item) => item.name !== "editOrphanage");
+  newState.routes = newState.routes.filter((item) => item.name !== "EditOrphanage");
 
   function handleToSignOut() {
     return signOut();
@@ -58,6 +52,7 @@ export default function appRoutes() {
         name="OrphanagesRegistered"
         component={OrphanagesRegistered}
         options={{
+          title: 'Orfanatos Cadastrados',
           headerShown: true,
           header: () => <Header showGoBack={false} showCancel={false} title="Orfanatos Cadastrados" showDrawerMenu={true} />
         }}
@@ -66,14 +61,16 @@ export default function appRoutes() {
         name="OrphanagesPending"
         component={OrphanagesPending}
         options={{
+          title: 'Cadastros Pendentes',
           headerShown: true,
           header: () => <Header showGoBack={true} showCancel={false} title="Cadastros Pendentes" showDrawerMenu={true} />
         }}
       />
       <AppDrawer.Screen
-        name="editOrphanage"
-        component={editOrphanage}
+        name="EditOrphanage"
+        component={EditOrphanage}
         options={{
+          title: 'Editar Orfanato',
           headerShown: true,
           header: () => <Header showGoBack={true} showCancel={false} title="Editar Orfanato" showDrawerMenu={true} />
         }}
@@ -82,6 +79,7 @@ export default function appRoutes() {
         name="ChangePassword"
         component={ChangePassword}
         options={{
+          title: 'Alterar Senha',
           headerShown: true,
           header: () => <Header showGoBack={true} showCancel={false} title="Alterar Senha" showDrawerMenu={true} />
         }}

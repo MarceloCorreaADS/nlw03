@@ -2,29 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { ScrollView, View, StyleSheet, Switch, Text, TextInput, TouchableOpacity, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { RectButton } from 'react-native-gesture-handler';
-import { useRoute, NavigatorScreenParams, RouteProp } from '@react-navigation/native';
+
 import * as ImagePicker from 'expo-image-picker';
+
 import api from '../../services/api';
-import { MaterialTopTabNavigationProp, MaterialTopTabScreenProps } from '@react-navigation/material-top-tabs';
-import { DrawerNavigationProp } from '@react-navigation/drawer';
+import { PropsTab }  from '../../routes/types';
 
-
-type RootTabParamList = {
-  Dados: { id: number };
-  Mapa: undefined;
-};
-
-type ProfileScreenRouteProp = RouteProp<RootTabParamList, 'Dados'>;
-
-type ProfileScreenNavigationProp = MaterialTopTabNavigationProp<
-  RootTabParamList,
-  'Dados'
->;
-
-type Props = {
-  route: ProfileScreenRouteProp;
-  navigation: ProfileScreenNavigationProp;
-};
 
 interface OrphanageEditRouteParams {
   id: number;
@@ -46,7 +29,7 @@ interface Orphanage {
 }
 
 
-export default function OrphanageEdit({route, navigation} : Props) {
+export default function OrphanageEdit({route, navigation} : PropsTab) {
   const [orphanage, setOrphanage] = useState<Orphanage>();
   const [name, setName] = useState('');
   const [about, setAbout] = useState('');
@@ -57,7 +40,6 @@ export default function OrphanageEdit({route, navigation} : Props) {
 
   const params = route.params as OrphanageEditRouteParams;
 
-   console.log(params.id);
   useEffect(() => {
     api.get(`orphanages/${params.id}`).then(response => {
       setOrphanage(response.data);
@@ -70,9 +52,9 @@ export default function OrphanageEdit({route, navigation} : Props) {
     const latitude = orphanage?.latitude;
     const longitude = orphanage?.longitude;
 
-    if(params.position){
-      const { latitude, longitude } = params.position;
-    }
+    // if(params.position){
+    //   const { latitude, longitude } = params.position;
+    // }
     
     const data = new FormData();
 

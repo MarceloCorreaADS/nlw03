@@ -1,41 +1,15 @@
-import React, { useState } from 'react';
-import { NavigatorScreenParams, RouteProp, useFocusEffect } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
+import { ScrollView, RectButton } from 'react-native-gesture-handler';
+
 import MapView, { Marker } from 'react-native-maps';
 import { Feather } from '@expo/vector-icons';
-import { RectButton } from 'react-native-gesture-handler';
-
-import api from '../../services/api';
 
 import mapMarkerImg from '../../images/map-marker.png';
 import noDataImg from '../../images/no-data.png';
 
-import { DrawerNavigationProp } from '@react-navigation/drawer';
-
-type RootDrawerParamList = {
-  OrphanagesRegistered: undefined;
-  OrphanagesPending: undefined;
-  editOrphanage: NavigatorScreenParams<RootTabParamList>;
-  ChangePassword: undefined;
-};
-
-type RootTabParamList = {
-  Dados: { id: number };
-  Mapa: undefined;
-};
-
-type ProfileScreenRouteProp = RouteProp<RootDrawerParamList, 'OrphanagesPending'>;
-
-type ProfileScreenNavigationProp = DrawerNavigationProp<
-  RootDrawerParamList,
-  'OrphanagesPending'
->;
-
-type Props = {
-  route: ProfileScreenRouteProp;
-  navigation: ProfileScreenNavigationProp;
-};
+import api from '../../services/api';
+import { PropsDrawer }  from '../../routes/types';
 
 interface Orphanage {
   id: number;
@@ -44,18 +18,18 @@ interface Orphanage {
   longitude: number;
 }
 
-export default function orphanagesPending({navigation} : Props) {
+export default function orphanagesPending({navigation} : PropsDrawer) {
   const [orphanages, setOrphanages] = useState<Orphanage[]>([]);
 
-  useFocusEffect(() => {
+  useEffect(() => {
     api.get('orphanagesPending').then(response => {
       setOrphanages(response.data);
     });
   });
 
   function handleNavigateToEditOrphanage(id: number) {
-    navigation.navigate('editOrphanage', {
-      screen: 'Dados',
+    navigation.navigate('EditOrphanage', {
+      screen: 'OrphanageEditInfos',
       params: { id : id },
     });
   }
