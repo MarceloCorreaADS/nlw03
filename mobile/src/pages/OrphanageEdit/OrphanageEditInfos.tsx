@@ -22,6 +22,7 @@ interface Orphanage {
   instructions: string;
   opening_hours: string;
   open_on_weekends: boolean;
+  register_approved: boolean;
   images: Array<{
     id: number;
     url: string;
@@ -31,10 +32,11 @@ interface Orphanage {
 
 export default function OrphanageEdit({route, navigation} : PropsTab) {
   const [orphanage, setOrphanage] = useState<Orphanage>();
+  const [id, setId] = useState('');
   const [name, setName] = useState('');
   const [about, setAbout] = useState('');
   const [instructions, setInstructions] = useState('');
-  const [opening_hours, setOpeningHours] = useState('');
+  const [opening_hours, setOpening_Hours] = useState('');
   const [open_on_weekends, setOpen_on_weekends] = useState(false);
   const [images, setImages] = useState<string[]>([]);
 
@@ -43,7 +45,13 @@ export default function OrphanageEdit({route, navigation} : PropsTab) {
   useEffect(() => {
     api.get(`orphanages/${params.id}`).then(response => {
       setOrphanage(response.data);
-    })
+      setId(response.data.id);
+      setName(response.data.name);
+      setAbout(response.data.about);
+      setInstructions(response.data.instructions);
+      setOpening_Hours(response.data.opening_hours);
+      setOpen_on_weekends(response.data.open_on_weekends);
+    });
   }, [params.id]);
 
 
@@ -57,7 +65,7 @@ export default function OrphanageEdit({route, navigation} : PropsTab) {
     // }
     
     const data = new FormData();
-
+    data.append('id', id);
     data.append('name', name);
     data.append('about', about);
     data.append('latitude', String(latitude));
@@ -65,6 +73,7 @@ export default function OrphanageEdit({route, navigation} : PropsTab) {
     data.append('instructions', instructions);
     data.append('opening_hours', opening_hours);
     data.append('open_on_weekends', String(open_on_weekends));
+    data.append('register_approved', 'true');
 
     images.forEach((image, index) => {
       data.append('images', {
@@ -73,10 +82,27 @@ export default function OrphanageEdit({route, navigation} : PropsTab) {
         uri: image,
       } as any)
     })
-    console.log(data);
-    await api.put('orphanages', data);
+    
+    try{
+      const response = await api.post('orphanagesUpdate', data);
+      alert(response.statusText);
+      navigation.dangerouslyGetParent()?.navigate('OrphanagesPending');
+    }catch(error){
+      if(error.response){
+        alert(error.response.data.error);
+      } else if (error.request){
+        console.log(error.request);
+      } else {
+        console.log('Error', error.message);
+      }
+    }
+  }
 
-    //redirecionar
+  async function handleRefuseOrphanage() {
+    const response = await api.delete(`orphanages/${orphanage?.id}`);
+
+    alert(response.statusText);
+    navigation.dangerouslyGetParent()?.navigate('OrphanagesPending');
   }
 
   async function handleSelectImages() {
@@ -110,7 +136,7 @@ export default function OrphanageEdit({route, navigation} : PropsTab) {
       <Text style={styles.label}>Nome</Text>
       <TextInput
         style={styles.input}
-        value={orphanage?.name}
+        value={name}
         onChangeText={setName}
       />
 
@@ -118,7 +144,7 @@ export default function OrphanageEdit({route, navigation} : PropsTab) {
       <TextInput
         style={[styles.input, { height: 110 }]}
         multiline
-        value={orphanage?.about}
+        value={about}
         onChangeText={setAbout}
       />
 
@@ -138,6 +164,15 @@ export default function OrphanageEdit({route, navigation} : PropsTab) {
             />
           );
         })}
+        {images.map(image => {
+          return (
+            <Image
+              key={image}
+              source={{ uri: image }}
+              style={styles.uploadedImage}
+            />
+          );
+        })}
       </View>
 
       <TouchableOpacity style={styles.imagesInput} onPress={handleSelectImages}>
@@ -150,15 +185,15 @@ export default function OrphanageEdit({route, navigation} : PropsTab) {
       <TextInput
         style={[styles.input, { height: 110 }]}
         multiline
-        value={orphanage?.instructions}
+        value={instructions}
         onChangeText={setInstructions}
       />
 
       <Text style={styles.label}>Horario de visitas</Text>
       <TextInput
         style={styles.input}
-        value={orphanage?.opening_hours}
-        onChangeText={setOpeningHours}
+        value={opening_hours}
+        onChangeText={setOpening_Hours}
       />
 
       <View style={styles.switchContainer}>
@@ -166,14 +201,28 @@ export default function OrphanageEdit({route, navigation} : PropsTab) {
         <Switch
           thumbColor="#fff"
           trackColor={{ false: '#ccc', true: '#39CC83' }}
-          value={orphanage?.open_on_weekends}
+          value={open_on_weekends}
           onValueChange={setOpen_on_weekends}
         />
       </View>
-
-      <RectButton style={styles.nextButton} onPress={handleEditOrphanage}>
-        <Text style={styles.nextButtonText}>Cadastrar</Text>
-      </RectButton>
+      { orphanage?.register_approved == true ? 
+        (
+          <RectButton style={styles.nextButton} onPress={handleEditOrphanage}>
+            <Text style={styles.nextButtonText}>Confirmar</Text>
+          </RectButton>
+        ) : (
+          <View style={styles.buttonsContainer}>
+            <RectButton style={styles.refuseButton} onPress={handleRefuseOrphanage}>
+              <Feather name="x-circle" size={24} style={styles.iconButton} color="#FFF" />
+              <Text style={styles.nextButtonText}>Recusar</Text>
+            </RectButton>
+            <RectButton style={styles.acceptButton} onPress={handleEditOrphanage}>
+              <Feather name="check" size={24} style={styles.iconButton} color="#FFF" />
+              <Text style={styles.nextButtonText}>Aceitar</Text>
+            </RectButton>
+          </View>
+        )
+      }
     </ScrollView>
   )
 }
@@ -255,6 +304,35 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: 56,
     marginTop: 32,
+  },
+
+  buttonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 32,
+    height: 56,
+  },
+
+  iconButton: {
+    paddingRight: 5,
+  },
+
+  acceptButton: {
+    backgroundColor: '#3CDC8C',
+    borderRadius: 20,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '48%',
+  },
+
+  refuseButton: {
+    backgroundColor: '#FF669D',
+    borderRadius: 20,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '48%',
   },
 
   nextButtonText: {

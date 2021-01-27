@@ -3,6 +3,24 @@ import { getRepository } from 'typeorm';
 import Orphanage from '../models/Orphanage';
 import orphanagesView from '../views/orphanages_view';
 import * as Yup from 'yup';
+import Image from '../models/Image';
+
+//Schema para validação usado em Create e update
+const schema = Yup.object().shape({
+  name: Yup.string().required(),
+  latitude: Yup.number().required(),
+  longitude: Yup.number().required(),
+  about: Yup.string().required().max(300),
+  instructions: Yup.string().required(),
+  opening_hours: Yup.string().required(),
+  open_on_weekends: Yup.boolean().required(),
+  register_approved: Yup.boolean().required(),
+  images: Yup.array(
+    Yup.object().shape({
+      path: Yup.string().required()
+    })
+  )
+});
 
 export default {
   async index(request: Request, response: Response) {
@@ -36,7 +54,7 @@ export default {
 
     const orphanagesRepository = getRepository(Orphanage);
 
-    const orphanage = await orphanagesRepository.findOneOrFail(id,{
+    const orphanage = await orphanagesRepository.findOneOrFail(id, {
       relations: ['images']
     });
 
@@ -75,24 +93,6 @@ export default {
       images
     };
 
-    const schema = Yup.object().shape({
-      name: Yup.string().required(),
-      latitude: Yup.number().required(),
-      longitude: Yup.number().required(),
-      about: Yup.string().required().max(300),
-      instructions: Yup.string().required(),
-      opening_hours: Yup.string().required(),
-      open_on_weekends: Yup.boolean().required(),
-      register_approved: Yup.boolean().required(),
-      images: Yup.array(
-        Yup.object().shape({
-          path: Yup.string().required()
-        })
-      )
-    });
-
-    const finalData = schema.cast(data);
-
     await schema.validate(data, {
       abortEarly: false,
     })
@@ -115,26 +115,40 @@ export default {
       opening_hours,
       open_on_weekends,
       register_approved,
+      deletedImages,
     } = request.body;
 
     const orphanagesRepository = getRepository(Orphanage);
+    const imagesRepository = getRepository(Image);
 
-    const orphanage = await orphanagesRepository.findOneOrFail(id);
+    //Recupero o orfanato para saber qual está sendo atualizado
+    const orphanageFromDB = await orphanagesRepository.findOneOrFail(id, {
+      relations: ['images']
+    });
 
-    if(register_approved === false){
-      orphanagesRepository.delete(orphanage);
+    // Recupero as imagens enviadas - aqui só irão vir imagens novas
+    const requestImages = request.files as Express.Multer.File[];
 
-      return response.status(200).json({ sucess : 'Orphanage registration refused and deleted!'});
+    //Verifica se há imagens novas
+    if (requestImages.length > 0) {
+      //Se houver imagens novas faço um loop por todas as imagens
+      await Promise.all(requestImages.map(async image => {
+        const imageItem = new Image();
+        //Recupero o path onde a imagem foi salva pelo Multer
+        imageItem.path = image.filename
+        //Uso OrphanagefromDb para indicar qual a referencia de orfanato
+        imageItem.orphanage = orphanageFromDB;
+        //salvo a imagem no banco de dados
+        imagesRepository.save(imageItem);
+      }));
     }
 
-    //const requestImages = request.files as Express.Multer.File[];
-
-    //const images = requestImages.map(image => {
-    //  return { path: image.filename }
-    //})
+    //deletedImages um array de IDs de imagens para serem deletadas
+    if (deletedImages) {
+      imagesRepository.delete(deletedImages);
+    }
 
     const data = {
-      id,
       name,
       latitude,
       longitude,
@@ -142,42 +156,29 @@ export default {
       instructions,
       opening_hours,
       open_on_weekends: open_on_weekends === 'true',
-      register_approved,
-      //images
+      register_approved: register_approved === 'true',
     };
 
-    const schema = Yup.object().shape({
-      name: Yup.string().required(),
-      latitude: Yup.number().required(),
-      longitude: Yup.number().required(),
-      about: Yup.string().required().max(300),
-      instructions: Yup.string().required(),
-      opening_hours: Yup.string().required(),
-      open_on_weekends: Yup.boolean().required(),
-      register_approved: Yup.boolean().required(),
-      //images: Yup.array(
-      //  Yup.object().shape({
-      //    path: Yup.string().required()
-      //  })
-      //)
-    });
-
+    //valido os dados recebidos
     await schema.validate(data, {
       abortEarly: false,
     })
 
-    orphanage.name = data.name;
-    orphanage.latitude = data.latitude;
-    orphanage.longitude = data.longitude;
-    orphanage.about = data.about;
-    orphanage.instructions = data.instructions;
-    orphanage.opening_hours = data.opening_hours;
-    orphanage.open_on_weekends = data.open_on_weekends;
-    orphanage.register_approved = data.register_approved;
-    //orphanage.images = [data.images];
+    await orphanagesRepository.update(id, data);
 
-    await orphanagesRepository.save(orphanage);
-
-    return response.status(200).json(orphanage);
+    return response.status(200).json({ sucess: 'Orphanage updated!' });
   },
+
+  async delete(request: Request, response: Response) {
+    const { id } = request.params;
+
+    const orphanagesRepository = getRepository(Orphanage);
+
+    const orphanage = await orphanagesRepository.findOneOrFail(id);
+
+    orphanagesRepository.delete(orphanage);
+
+    return response.status(200).json({ sucess: 'Orphanage deleted!' });
+  },
+
 };

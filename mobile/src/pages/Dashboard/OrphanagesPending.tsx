@@ -98,6 +98,7 @@ export default function orphanagesPending({navigation} : PropsDrawer) {
 }
 
 const styles = StyleSheet.create({
+
   topBar: {
     marginTop: 5,
     flexDirection: 'row',

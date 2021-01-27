@@ -21,7 +21,7 @@ routes.post('/authenticate', AuthsController.authenticate);
 routes.post('/forgotPassword', AuthsController.forgotPassword);
 
 /* Middleware que faz a verificação do token */
-routes.use(authMiddleware);
+
 
 /* rotas que só são acessadas com token válido */
 
@@ -35,6 +35,7 @@ routes.post('/changePassword', AuthsController.changePassword);
 
 /* Rotas de orfanatos com token */
 routes.get('/orphanagesPending', OrphanagesController.indexPending);
-routes.put('/orphanages',OrphanagesController.update);
+routes.post('/orphanagesUpdate', upload.array('images'), OrphanagesController.update);
+routes.delete('/orphanages/:id',OrphanagesController.delete);
 
 export default routes;
