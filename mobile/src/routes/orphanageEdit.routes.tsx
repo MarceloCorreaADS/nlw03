@@ -5,7 +5,7 @@ import OrphanageEditInfos from '../pages/OrphanageEdit/OrphanageEditInfos';
 import OrphanageEditMapPosition from '../pages/OrphanageEdit/OrphanageEditMapPosition';
 
 type RootDrawerParamList = {
-  OrphanageEditInfos: { id: number };
+  OrphanageEditInfos: { id: number, previousRoute: string };
   OrphanageEditMapPosition: undefined;
 };
 

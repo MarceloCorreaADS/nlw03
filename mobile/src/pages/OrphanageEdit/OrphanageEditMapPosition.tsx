@@ -1,53 +1,56 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Dimensions, Text } from 'react-native';
+import { View, StyleSheet, Dimensions, Text, ActivityIndicator } from 'react-native';
 
-import { useNavigation, useRoute } from '@react-navigation/native';
-import { RectButton } from 'react-native-gesture-handler';
 import MapView, { MapEvent, Marker } from 'react-native-maps';
 
 import mapMarkerImg from '../../images/map-marker.png';
-import api from '../../services/api';
-
-// interface OrphanageEditRouteParams {
-//   id: number;
-// }
+import { useOrphanage } from '../../contexts/orphanage';
 
 export default function OrphanageEditMapPosition() {
   const [position, setPosition] = useState({ latitude: 0, longitude: 0 });
-  const route = useRoute();
-  //const params = route.params as OrphanageEditRouteParams;
+  const { orphanage } = useOrphanage();
 
-  // useEffect(() => {
-  //   api.get(`orphanages/${params.id}`).then(response => {
-  //     setPosition(response.data);
-  //   })
-  // }, [params.id]);
+  useEffect(() => {
+    if(orphanage){
+      setPosition({latitude: orphanage.latitude , longitude: orphanage.longitude});
+    }
+  }, [orphanage]);
 
-  function handleNextStep() {
-
-  }
+  useEffect(() => {
+    if(orphanage){
+      orphanage.latitude = position.latitude;
+      orphanage.longitude = position.longitude;
+    }
+  }, [position]);
 
   function handleSelectMapPosition(event: MapEvent) {
     setPosition(event.nativeEvent.coordinate);
   }
 
+  if (!orphanage) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size='large' color='#999' />
+      </View>
+    );
+  }
   return (
     <View style={styles.container}>
       <MapView
         initialRegion={{
-          latitude: -23.4696551,
-          longitude: -46.5451525,
+          latitude: position.latitude,
+          longitude: position.longitude,
           latitudeDelta: 0.008,
           longitudeDelta: 0.008,
         }}
         style={styles.mapStyle}
         onPress={handleSelectMapPosition}
       >
-        {position.latitude !== 0 && (
-          <Marker
-            icon={mapMarkerImg}
-            coordinate={{ latitude: position.latitude, longitude: position.longitude }}
-          />
+        { position.latitude !== 0 && (
+          <Marker 
+          icon={mapMarkerImg}
+          coordinate={{ latitude: position.latitude, longitude: position.longitude }}
+        />
         )}
       </MapView>
     </View>

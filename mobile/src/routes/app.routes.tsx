@@ -12,7 +12,7 @@ import { useAuth } from '../contexts/auth';
 type RootDrawerParamList = {
   OrphanagesRegistered: undefined;
   OrphanagesPending: undefined;
-  EditOrphanage: { id: number };
+  EditOrphanage: { id: number, previousRoute: string };
   ChangePassword: undefined;
 };
 

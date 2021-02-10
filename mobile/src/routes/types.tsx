@@ -10,7 +10,7 @@ type RootDrawerParamList = {
   };
   
   type RootTabParamList = {
-    OrphanageEditInfos: { id: number };
+    OrphanageEditInfos: { id: number, previousRoute: string };
     OrphanageEditMapPosition: undefined;
   };
   

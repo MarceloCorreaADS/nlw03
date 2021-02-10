@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, Alert } from 'react-native';
 import { RectButton, ScrollView } from 'react-native-gesture-handler';
 
 import { Feather } from '@expo/vector-icons';
@@ -19,7 +19,7 @@ interface Orphanage {
   longitude: number;
 }
 
-export default function OrphanagesRegistered({navigation} : PropsDrawer) {
+export default function OrphanagesRegistered({navigation, route} : PropsDrawer) {
   const { user } = useAuth();
   const [orphanages, setOrphanages] = useState<Orphanage[]>([]);
   const [load, setLoad] = useState(false);
@@ -40,12 +40,39 @@ export default function OrphanagesRegistered({navigation} : PropsDrawer) {
   function handleNavigateToEditOrphanage(id: number) {
     navigation.navigate('EditOrphanage', {
       screen: 'OrphanageEditInfos',
-      params: { id : id },
+      params: { id : id, previousRoute: route.name },
     });
   }
 
-  function handleNavigateToExcludeOrphanage() {
-
+  async function handleNavigateToExcludeOrphanage(id: number) {
+    Alert.alert(
+      'Atenção',
+      'Você realmente deseja excluir esse orfanato?',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel'
+        },
+        { text: 'Excluir', onPress: async () => 
+          {
+            try{
+              await api.delete(`orphanages/${id}`);
+              alert("Orfanato apagado!");
+              navigation.dangerouslyGetParent()?.navigate('OrphanagesPending');
+            }catch(error){
+              if(error.response){
+                alert(error.response.data.error);
+              } else if (error.request){
+                console.log(error.request);
+              } else {
+                console.log('Error', error.message);
+              }
+            }
+          }
+        }
+      ],
+      { cancelable: false }
+    );   
   }
   return (
     <View>
@@ -99,7 +126,7 @@ export default function OrphanagesRegistered({navigation} : PropsDrawer) {
                         <RectButton style={styles.bottomBarButton} onPress={() => handleNavigateToEditOrphanage(orphanage.id)}>
                           <Feather name="edit-3" size={20} color="#15C3D6" />
                         </RectButton>
-                        <RectButton style={styles.bottomBarButton} onPress={handleNavigateToExcludeOrphanage}>
+                        <RectButton style={styles.bottomBarButton} onPress={() => handleNavigateToExcludeOrphanage(orphanage.id)}>
                           <Feather name="trash-2" size={20} color="#15C3D6" />
                         </RectButton>
                       </View>

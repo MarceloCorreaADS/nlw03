@@ -7,10 +7,13 @@ import * as ImagePicker from 'expo-image-picker';
 
 import api from '../../services/api';
 import { PropsTab }  from '../../routes/types';
+import { useOrphanage } from '../../contexts/orphanage';
+import { ActivityIndicator } from 'react-native';
 
 
 interface OrphanageEditRouteParams {
   id: number;
+  previousRoute: string;
 }
 
 interface Orphanage {
@@ -29,9 +32,8 @@ interface Orphanage {
   }>;
 }
 
-
 export default function OrphanageEdit({route, navigation} : PropsTab) {
-  const [orphanage, setOrphanage] = useState<Orphanage>();
+  const { orphanage, orphanageLoad, clearOrphanage } = useOrphanage();
   const [id, setId] = useState('');
   const [name, setName] = useState('');
   const [about, setAbout] = useState('');
@@ -43,27 +45,29 @@ export default function OrphanageEdit({route, navigation} : PropsTab) {
   const params = route.params as OrphanageEditRouteParams;
 
   useEffect(() => {
-    api.get(`orphanages/${params.id}`).then(response => {
-      setOrphanage(response.data);
-      setId(response.data.id);
-      setName(response.data.name);
-      setAbout(response.data.about);
-      setInstructions(response.data.instructions);
-      setOpening_Hours(response.data.opening_hours);
-      setOpen_on_weekends(response.data.open_on_weekends);
-    });
-  }, [params.id]);
+    clearOrphanage();
 
+    async function awaitOrphanageLoad() {
+      await orphanageLoad(params.id);
+    }
+    awaitOrphanageLoad();
+  }, [params]);
+
+  useEffect(() => {
+    setId(String(orphanage?.id));
+    setName(String(orphanage?.name));
+    setAbout(String(orphanage?.about));
+    setInstructions(String(orphanage?.instructions));
+    setOpening_Hours(String(orphanage?.opening_hours));
+    setOpen_on_weekends(Boolean(orphanage?.open_on_weekends));
+    setImages([]);
+  }, [orphanage]);
 
   async function handleEditOrphanage() {
 
     const latitude = orphanage?.latitude;
     const longitude = orphanage?.longitude;
 
-    // if(params.position){
-    //   const { latitude, longitude } = params.position;
-    // }
-    
     const data = new FormData();
     data.append('id', id);
     data.append('name', name);
@@ -84,9 +88,15 @@ export default function OrphanageEdit({route, navigation} : PropsTab) {
     })
     
     try{
-      const response = await api.post('orphanagesUpdate', data);
-      alert(response.statusText);
-      navigation.dangerouslyGetParent()?.navigate('OrphanagesPending');
+      await api.post('orphanagesUpdate', data);
+      clearOrphanage();
+      if(params.previousRoute === 'OrphanagesRegistered'){
+        alert("Orfanato editado com sucesso!");
+      }else{
+        alert("Orfanato aprovado com sucesso!");
+      }
+      
+      navigation.dangerouslyGetParent()?.navigate(params.previousRoute);
     }catch(error){
       if(error.response){
         alert(error.response.data.error);
@@ -99,10 +109,19 @@ export default function OrphanageEdit({route, navigation} : PropsTab) {
   }
 
   async function handleRefuseOrphanage() {
-    const response = await api.delete(`orphanages/${orphanage?.id}`);
-
-    alert(response.statusText);
-    navigation.dangerouslyGetParent()?.navigate('OrphanagesPending');
+    try{
+      await api.delete(`orphanages/${orphanage?.id}`);
+      alert("Orfanato recusado!");
+      navigation.dangerouslyGetParent()?.navigate('OrphanagesPending');
+    }catch(error){
+      if(error.response){
+        alert(error.response.data.error);
+      } else if (error.request){
+        console.log(error.request);
+      } else {
+        console.log('Error', error.message);
+      }
+    }    
   }
 
   async function handleSelectImages() {
@@ -129,6 +148,13 @@ export default function OrphanageEdit({route, navigation} : PropsTab) {
 
   }
 
+  if (!orphanage) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size='large' color='#999' />
+      </View>
+    );
+  }
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ padding: 24 }}>
       <Text style={styles.title}>Dados</Text>

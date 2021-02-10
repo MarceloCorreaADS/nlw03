@@ -18,9 +18,9 @@ interface Orphanage {
   longitude: number;
 }
 
-export default function orphanagesPending({navigation} : PropsDrawer) {
+export default function orphanagesPending({navigation, route} : PropsDrawer) {
   const [orphanages, setOrphanages] = useState<Orphanage[]>([]);
-
+  
   useEffect(() => {
     api.get('orphanagesPending').then(response => {
       setOrphanages(response.data);
@@ -30,7 +30,7 @@ export default function orphanagesPending({navigation} : PropsDrawer) {
   function handleNavigateToEditOrphanage(id: number) {
     navigation.navigate('EditOrphanage', {
       screen: 'OrphanageEditInfos',
-      params: { id : id },
+      params: { id : id, previousRoute: route.name}
     });
   }
 
