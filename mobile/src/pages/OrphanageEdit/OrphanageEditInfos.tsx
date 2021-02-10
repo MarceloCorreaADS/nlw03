@@ -180,27 +180,28 @@ export default function OrphanageEdit({route, navigation} : PropsTab) {
       /> */}
 
       <Text style={styles.label}>Fotos</Text>
-      <View style={styles.uploadedImagesContainer}>
-        {orphanage?.images.map(image => {
-          return (
-            <Image
-              key={image.id}
-              source={{ uri: image.url }}
-              style={styles.uploadedImage}
-            />
-          );
-        })}
-        {images.map(image => {
-          return (
-            <Image
-              key={image}
-              source={{ uri: image }}
-              style={styles.uploadedImage}
-            />
-          );
-        })}
-      </View>
-
+      <ScrollView horizontal={true} style={styles.photosContainer}>
+        <View style={styles.uploadedImagesContainer}>
+          {orphanage?.images.map(image => {
+            return (
+              <Image
+                key={image.id}
+                source={{ uri: image.url }}
+                style={styles.uploadedImage}
+              />
+            );
+          })}
+          {images.map(image => {
+            return (
+              <Image
+                key={image}
+                source={{ uri: image }}
+                style={styles.uploadedImage}
+              />
+            );
+          })}
+        </View>
+      </ScrollView>
       <TouchableOpacity style={styles.imagesInput} onPress={handleSelectImages}>
         <Feather name="plus" size={24} color="#15B6D6" />
       </TouchableOpacity>
@@ -291,6 +292,10 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
 
+  photosContainer: {
+    marginBottom: 15,
+  },
+
   uploadedImagesContainer: {
     flexDirection: 'row',
   },
@@ -299,9 +304,8 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 20,
-    marginBottom: 32,
+    marginBottom: 17,
     marginRight: 8,
-
   },
 
   imagesInput: {

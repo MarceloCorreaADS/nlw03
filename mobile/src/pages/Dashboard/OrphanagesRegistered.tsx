@@ -44,7 +44,7 @@ export default function OrphanagesRegistered({navigation, route} : PropsDrawer) 
     });
   }
 
-  async function handleNavigateToExcludeOrphanage(id: number) {
+  function handleNavigateToExcludeOrphanage(id: number) {
     Alert.alert(
       'Atenção',
       'Você realmente deseja excluir esse orfanato?',
@@ -75,7 +75,7 @@ export default function OrphanagesRegistered({navigation, route} : PropsDrawer) 
     );   
   }
   return (
-    <View>
+    <ScrollView>
       {
         orphanages.length === 0 ? (
           <View style={styles.noDataContainer}>
@@ -83,7 +83,7 @@ export default function OrphanagesRegistered({navigation, route} : PropsDrawer) 
             <Text style={styles.noDataText}>Nenhum no momento</Text>
           </View>
         ) : (
-            <ScrollView>
+          <View style={styles.viewContainer}>
               <View style={styles.topBar}>
                 <Text style={styles.orphanageCountText}>
                   {orphanages.length}
@@ -135,13 +135,17 @@ export default function OrphanagesRegistered({navigation, route} : PropsDrawer) 
                   </View>
                 );
               })}
-            </ScrollView>
+            </View>
           )}
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+
+  viewContainer: {
+    marginBottom: 10,
+  },
 
   topBar: {
     marginTop: 5,
