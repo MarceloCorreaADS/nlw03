@@ -1,20 +1,52 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
+import AsyncStorage from '@react-native-community/async-storage';
 
 import Header from '../components/Header';
 import OrphanagesMap from '../pages/OrphanagesMap';
+import HappyOnboarding from '../pages/HappyOnboarding';
 import OrphanageDetails from '../pages/OrphanageDetails';
 import SelectMapPosition from '../pages/CreateOrphanage/SelectMapPosition';
 import OrphanageData from '../pages/CreateOrphanage/OrphanageData';
-import ForgotPassword from '../pages/Auth/ForgotPassword'
+import ForgotPassword from '../pages/Auth/ForgotPassword';
 
 import SignIn from '../pages/Auth/SignIn';
 
 const AuthStack = createStackNavigator();
 
 export default function AuthRoutes() {
+  const [isFirstLaunch, setIsFirstLaunch] = useState<boolean>(null);
+  let routeName;
+
+  useEffect(() => {
+    AsyncStorage.getItem('alreadyLaunched').then((value) => {
+      if (value == null) {
+        AsyncStorage.setItem('alreadyLaunched', 'true');
+        setIsFirstLaunch(true);
+      } else {
+        setIsFirstLaunch(false);
+      }
+    });
+  
+  }, []);
+
+  if (isFirstLaunch === null) {
+    return null; 
+  } else if (isFirstLaunch == true) {
+    routeName = 'Onboarding';
+  } else {
+    routeName = 'OrphanagesMap';
+  }
+
   return (
-    <AuthStack.Navigator>
+    <AuthStack.Navigator initialRouteName={routeName} >
+      <AuthStack.Screen
+        name="Onboarding"
+        component={HappyOnboarding}
+        options={{
+          headerShown: false,
+        }}
+      />
       <AuthStack.Screen
         name="OrphanagesMap"
         component={OrphanagesMap}
