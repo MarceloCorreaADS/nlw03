@@ -21,8 +21,8 @@ Desenvolvido na Next Level Week #03, workshop sediado pela [Rocktseat](https://r
 - [x] Recuperação de senhas
 - [x] Menu de usuário
 - [x] Aprovação de cadastro de orfanatos
-- [ ] Splash Screen no React Native com Expo
-- [ ] Onboarding do usuário
+- [x] Splash Screen no React Native com Expo
+- [x] Onboarding do usuário
 - [ ] Localização real do usuário
 - [ ] Cadastro em múltiplas etapas
 - [x] Logout da aplicação
